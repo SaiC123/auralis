@@ -38,6 +38,7 @@ export default function MotorSenseDetector({ onComplete }) {
   const timerNumberRef = useRef(null)
 
   useEffect(() => {
+    let active = true
     let isRunning = false
     let testDone = false
     let timeLeft = 10
@@ -284,6 +285,7 @@ export default function MotorSenseDetector({ onComplete }) {
     }
 
     function onResults(results) {
+      if (!active) return
       if (!canvasEl || !videoEl) return
       canvasEl.width = videoEl.videoWidth
       canvasEl.height = videoEl.videoHeight
@@ -414,7 +416,11 @@ export default function MotorSenseDetector({ onComplete }) {
     }
 
     async function initMediaPipe() {
+      if (!active) return
       try {
+        if (typeof window !== 'undefined') {
+          window.Module = undefined
+        }
         hands = new window.Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` })
         hands.setOptions({
           maxNumHands: 1,
@@ -424,9 +430,16 @@ export default function MotorSenseDetector({ onComplete }) {
         })
         hands.onResults(onResults)
         const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' } })
+        if (!active) {
+          stream.getTracks().forEach((track) => track.stop())
+          return
+        }
         videoEl.srcObject = stream
         camera = new window.Camera(videoEl, {
-          onFrame: async () => { await hands.send({ image: videoEl }) },
+          onFrame: async () => {
+            if (!active) return
+            await hands.send({ image: videoEl })
+          },
           width: 640,
           height: 480,
         })
@@ -446,9 +459,12 @@ export default function MotorSenseDetector({ onComplete }) {
       if (resetBtn) resetBtn.classList.add('hidden')
       if (resultsCard) resultsCard.classList.add('hidden')
       for (const src of MEDIA_PIPE_SCRIPTS) {
+        if (!active) return
         await loadScript(src)
       }
+      if (!active) return
       await initMediaPipe()
+      if (!active) return
       resizeCharts()
     }
 
@@ -460,11 +476,22 @@ export default function MotorSenseDetector({ onComplete }) {
     if (resetBtn) resetBtn.addEventListener('click', resetTest)
 
     return () => {
+      active = false
       window.removeEventListener('resize', handleResize)
       if (startBtn) startBtn.removeEventListener('click', startTest)
       if (resetBtn) resetBtn.removeEventListener('click', resetTest)
       window.clearInterval(timerInterval)
       if (camera && typeof camera.stop === 'function') camera.stop()
+      if (hands && typeof hands.close === 'function') {
+        try {
+          hands.close()
+        } catch (e) {
+          console.error('Error closing hands:', e)
+        }
+      }
+      if (typeof window !== 'undefined') {
+        window.Module = undefined
+      }
       if (videoEl && videoEl.srcObject) {
         videoEl.srcObject.getTracks().forEach((track) => track.stop())
       }
@@ -619,6 +646,7 @@ export default function MotorSenseDetector({ onComplete }) {
           inset: 0;
           background-image: linear-gradient(rgba(124,109,250,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,109,250,0.03) 1px, transparent 1px);
           background-size: 40px 40px;
+          pointer-events: none;
         }
 
         .motor-sense-shell header {

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useRouter, usePathname } from 'next/navigation'
 
-const PUBLIC_ROUTES = ['/', '/login', '/signup', '/auth/callback', '/detect']
+const PUBLIC_ROUTES = ['/', '/login', '/signup', '/auth/callback', '/detect', '/results']
 const AUTH_ONLY_ROUTES = ['/login', '/signup']
 const PROTECTED_PREFIXES = ['/dashboard']
 

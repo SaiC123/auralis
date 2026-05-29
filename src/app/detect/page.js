@@ -296,194 +296,6 @@ function VoiceStep({ onComplete }) {
   )
 }
 
-/* ─── Step 3: Combined Results ─── */
-function ResultsStep({ voiceResults, motorResults }) {
-  const motor = motorResults
-  const motorMeta = motor ? SCORE_META[motor.score] : null
-
-  return (
-    <div>
-      <div className="mb-8">
-        <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.5rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: 6 }}>
-          Your Assessment Results
-        </h2>
-        <p style={{ color: 'var(--muted)', fontSize: '0.95rem', lineHeight: 1.6 }}>
-          Below are your voice biomarker and motor assessment findings. This is a
-          research prototype — results are not a clinical diagnosis.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Motor results */}
-        <div style={{ background: '#fff', border: '1.5px solid var(--border)', borderRadius: 16, overflow: 'hidden' }}>
-          <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: '1.1rem' }}>✋</span>
-            <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--foreground)' }}>Motor Assessment</span>
-          </div>
-          {motor ? (
-            <div style={{ padding: 20 }}>
-              {/* Risk banner */}
-              <div
-                style={{
-                  padding: '12px 16px',
-                  borderRadius: 10,
-                  background: motorMeta.bg,
-                  border: `1.5px solid ${motorMeta.border}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  marginBottom: 16,
-                }}
-              >
-                <span
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: '50%',
-                    background: motorMeta.color,
-                    color: '#fff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    flexShrink: 0,
-                  }}
-                >
-                  {motorMeta.icon}
-                </span>
-                <span style={{ fontWeight: 600, color: motorMeta.color, fontSize: '0.9rem' }}>
-                  {motorMeta.label}
-                </span>
-              </div>
-
-              {/* Metric rows */}
-              {[
-                ['Total taps', motor.taps],
-                ['Tap frequency', `${motor.freq?.toFixed(2)} Hz`],
-                ['Mean amplitude', `${motor.amp} (normalized)`],
-                ['Amplitude decay', `${motor.decay?.toFixed(1)}%`],
-                ['Rhythm irregularity (CV)', `${motor.cv?.toFixed(1)}%`],
-                ['Bradykinesia score', `${motor.brady} / 100`],
-              ].map(([k, v]) => (
-                <div
-                  key={k}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '8px 0',
-                    borderBottom: '1px solid var(--border)',
-                    fontSize: '0.875rem',
-                  }}
-                >
-                  <span style={{ color: 'var(--muted)', fontFamily: "'DM Mono', monospace", fontSize: '0.78rem' }}>{k}</span>
-                  <span style={{ fontWeight: 600, color: 'var(--foreground)' }}>{v}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div style={{ padding: 20, color: 'var(--muted)', fontSize: '0.9rem' }}>
-              Motor assessment not completed.
-            </div>
-          )}
-        </div>
-
-        {/* Voice results */}
-        <div style={{ background: '#fff', border: '1.5px solid var(--border)', borderRadius: 16, overflow: 'hidden' }}>
-          <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: '1.1rem' }}>🎙️</span>
-            <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--foreground)' }}>Voice Biomarker Analysis</span>
-          </div>
-          {voiceResults ? (
-            <div style={{ padding: 20 }}>
-              {Object.entries(voiceResults).map(([disease, info]) => {
-                const positive = info.prediction === 1
-                const confidence = Math.round((info.confidence ?? 0) * 100)
-                return (
-                  <div
-                    key={disease}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '10px 0',
-                      borderBottom: '1px solid var(--border)',
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--muted)', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                        Classification
-                      </div>
-                      <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--foreground)', marginTop: 2 }}>
-                        {disease.replace(/_/g, ' ')}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          padding: '3px 10px',
-                          borderRadius: 100,
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          fontFamily: "'DM Mono', monospace",
-                          background: positive ? '#fef2f2' : '#ecfdf5',
-                          color: positive ? '#dc2626' : '#059669',
-                          border: `1px solid ${positive ? '#fecaca' : '#a7f3d0'}`,
-                        }}
-                      >
-                        {positive ? 'POSITIVE' : 'NEGATIVE'}
-                      </span>
-                      <div style={{ fontSize: '0.72rem', color: 'var(--muted)', marginTop: 4, fontFamily: "'DM Mono', monospace" }}>
-                        {confidence}% confidence
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          ) : (
-            <div style={{ padding: 20, color: 'var(--muted)', fontSize: '0.9rem' }}>
-              Voice analysis not completed.
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Disclaimer */}
-      <div
-        style={{
-          padding: '16px 20px',
-          borderRadius: 12,
-          background: 'rgba(0,151,178,0.05)',
-          border: '1px solid rgba(0,151,178,0.2)',
-          fontSize: '0.85rem',
-          color: 'var(--muted)',
-          lineHeight: 1.6,
-          marginBottom: 24,
-        }}
-      >
-        ⚕ <strong style={{ color: 'var(--foreground)' }}>Important:</strong> Auarlis is a research
-        prototype and these results are not a clinical diagnosis. A positive indicator does not mean
-        you have Parkinson&apos;s disease. Please consult a licensed neurologist for any medical concerns.
-      </div>
-
-      <div className="flex flex-wrap gap-4">
-        <Link href="/" className="btn-secondary" style={{ padding: '12px 24px' }}>
-          ← Back to Home
-        </Link>
-        <button
-          onClick={() => window.location.reload()}
-          className="btn-primary"
-          style={{ padding: '12px 24px' }}
-        >
-          Run New Assessment
-        </button>
-      </div>
-    </div>
-  )
-}
 
 /* ─── Step indicator ─── */
 function StepIndicator({ step }) {
@@ -568,7 +380,7 @@ function MotorStep({ onComplete }) {
             className="btn-primary"
             style={{ padding: '12px 28px', fontSize: '0.95rem', borderRadius: 12 }}
           >
-            View Combined Results →
+            view combined results
           </button>
         </div>
       )}
@@ -579,17 +391,21 @@ function MotorStep({ onComplete }) {
 /* ─── Main Page ─── */
 export default function DetectPage() {
   const [step, setStep] = useState('voice')
-  const [voiceResults, setVoiceResults] = useState(null)
-  const [motorResults, setMotorResults] = useState(null)
+  const voiceResultsRef = useRef(null)
 
   const handleVoiceDone = (results) => {
-    setVoiceResults(results)
+    voiceResultsRef.current = results
     setStep('motor')
   }
 
   const handleMotorDone = (results) => {
-    setMotorResults(results)
-    setStep('results')
+    try {
+      window.sessionStorage.setItem('voiceResults', JSON.stringify(voiceResultsRef.current))
+      window.sessionStorage.setItem('motorResults', JSON.stringify(results))
+    } catch (e) {
+      console.error('Failed to save results:', e)
+    }
+    window.location.href = '/results'
   }
 
   return (
@@ -641,16 +457,21 @@ export default function DetectPage() {
         >
           {step === 'voice' && <VoiceStep onComplete={handleVoiceDone} />}
           {step === 'motor' && <MotorStep onComplete={handleMotorDone} />}
-          {step === 'results' && (
-            <ResultsStep voiceResults={voiceResults} motorResults={motorResults} />
-          )}
         </div>
 
         {/* Skip motor step link (if voice failed / backend down) */}
         {step === 'motor' && (
           <div style={{ textAlign: 'center', marginTop: 16 }}>
             <button
-              onClick={() => setStep('results')}
+              onClick={() => {
+                try {
+                  window.sessionStorage.setItem('voiceResults', JSON.stringify(voiceResultsRef.current))
+                  window.sessionStorage.removeItem('motorResults')
+                } catch (e) {
+                  console.error('Failed to save results:', e)
+                }
+                window.location.href = '/results'
+              }}
               style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: '0.85rem', cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit' }}
             >
               Skip motor test and view voice results only
