@@ -11,35 +11,35 @@ const MotorSenseDetector = dynamic(
 
 const BACKEND_BASE =
   (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_BACKEND_URL) ||
-  'http://192.168.1.132:9200'
+  'http://172.20.10.7:9200'
 
 const AUDIO_SLOTS = [
-  { key: 'breathing_deep',    label: 'Deep Breathing',       hint: 'Breathe in deeply and out slowly for 3 seconds.' },
-  { key: 'breathing_shallow', label: 'Shallow Breathing',    hint: 'Breathe gently through your nose for 3 seconds.' },
-  { key: 'cough_heavy',       label: 'Heavy Cough',          hint: 'Cough forcefully from your chest once or twice.' },
-  { key: 'cough_shallow',     label: 'Shallow Cough',        hint: 'Give a light, gentle cough.' },
-  { key: 'counting_fast',     label: 'Fast Counting (1–10)', hint: 'Count from 1 to 10 as quickly as possible.' },
-  { key: 'counting_normal',   label: 'Normal Counting (1–10)', hint: 'Count from 1 to 10 at a comfortable pace.' },
-  { key: 'vowel_a',           label: "Vowel 'Ahh'",          hint: "Say 'Ahh' and hold it for 3 seconds." },
-  { key: 'vowel_e',           label: "Vowel 'Eee'",          hint: "Say 'Eee' and hold it for 3 seconds." },
-  { key: 'vowel_o',           label: "Vowel 'Ohh'",          hint: "Say 'Ohh' and hold it for 3 seconds." },
+  { key: 'breathing_deep', label: 'Deep Breathing', hint: 'Breathe in deeply and out slowly for 3 seconds.' },
+  { key: 'breathing_shallow', label: 'Shallow Breathing', hint: 'Breathe gently through your nose for 3 seconds.' },
+  { key: 'cough_heavy', label: 'Heavy Cough', hint: 'Cough forcefully from your chest once or twice.' },
+  { key: 'cough_shallow', label: 'Shallow Cough', hint: 'Give a light, gentle cough.' },
+  { key: 'counting_fast', label: 'Fast Counting (1–10)', hint: 'Count from 1 to 10 as quickly as possible.' },
+  { key: 'counting_normal', label: 'Normal Counting (1–10)', hint: 'Count from 1 to 10 at a comfortable pace.' },
+  { key: 'vowel_a', label: "Vowel 'Ahh'", hint: "Say 'Ahh' and hold it for 3 seconds." },
+  { key: 'vowel_e', label: "Vowel 'Eee'", hint: "Say 'Eee' and hold it for 3 seconds." },
+  { key: 'vowel_o', label: "Vowel 'Ohh'", hint: "Say 'Ohh' and hold it for 3 seconds." },
 ]
 
 const SCORE_META = {
-  normal:   { label: 'Within Normal Range',       color: '#059669', bg: '#ecfdf5', border: '#a7f3d0', icon: '✓' },
-  mild:     { label: 'Mildly Irregular Patterns', color: '#d97706', bg: '#fffbeb', border: '#fde68a', icon: '⚠' },
-  elevated: { label: 'Notable Motor Irregularity',color: '#dc2626', bg: '#fef2f2', border: '#fecaca', icon: '!' },
+  normal: { label: 'Within Normal Range', color: '#059669', bg: '#ecfdf5', border: '#a7f3d0', icon: '✓' },
+  mild: { label: 'Mildly Irregular Patterns', color: '#d97706', bg: '#fffbeb', border: '#fde68a', icon: '⚠' },
+  elevated: { label: 'Notable Motor Irregularity', color: '#dc2626', bg: '#fef2f2', border: '#fecaca', icon: '!' },
 }
 
 /* ─── Step 1: Voice Recording ─── */
 function VoiceStep({ onComplete }) {
   const [audioFiles, setAudioFiles] = useState({})
-  const [recording, setRecording]   = useState({})
+  const [recording, setRecording] = useState({})
   const [activeSlot, setActiveSlot] = useState(null)
-  const [loading, setLoading]        = useState(false)
-  const [error, setError]            = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
   const recorders = useRef({})
-  const chunks    = useRef({})
+  const chunks = useRef({})
 
   const filled = Object.keys(audioFiles).length
   const allFilled = filled === AUDIO_SLOTS.length
@@ -143,7 +143,7 @@ function VoiceStep({ onComplete }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {AUDIO_SLOTS.map(({ key, label, hint }) => {
           const hasFile = !!audioFiles[key]
-          const isRec   = !!recording[key]
+          const isRec = !!recording[key]
           const isActive = activeSlot === key
 
           return (
@@ -578,7 +578,7 @@ function MotorStep({ onComplete }) {
 
 /* ─── Main Page ─── */
 export default function DetectPage() {
-  const [step, setStep]               = useState('voice')
+  const [step, setStep] = useState('voice')
   const [voiceResults, setVoiceResults] = useState(null)
   const [motorResults, setMotorResults] = useState(null)
 
@@ -639,8 +639,8 @@ export default function DetectPage() {
             boxShadow: '0 4px 24px rgba(0,0,0,0.05)',
           }}
         >
-          {step === 'voice'   && <VoiceStep   onComplete={handleVoiceDone} />}
-          {step === 'motor'   && <MotorStep   onComplete={handleMotorDone} />}
+          {step === 'voice' && <VoiceStep onComplete={handleVoiceDone} />}
+          {step === 'motor' && <MotorStep onComplete={handleMotorDone} />}
           {step === 'results' && (
             <ResultsStep voiceResults={voiceResults} motorResults={motorResults} />
           )}
