@@ -11,7 +11,7 @@ const MotorSenseDetector = dynamic(
 
 const BACKEND_BASE =
   (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_BACKEND_URL) ||
-  'http://172.20.10.7:9200'
+  'http://172.20.10.4:9200'
 
 const AUDIO_SLOTS = [
   { key: 'breathing_deep', label: 'Deep Breathing', hint: 'Breathe in deeply and out slowly for 3 seconds.' },
